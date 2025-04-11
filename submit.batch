@@ -1,0 +1,43 @@
+#!/bin/bash
+#SBATCH --job-name=zfp-test
+#SBATCH --account=extremedata
+#SBATCH --time=0:05:00
+#SBATCH --nodes=2
+#SBATCH -o %x.o%j
+#SBATCH --partition=short
+#SBATCH --exclusive
+
+export EXAWIND_MANAGER=${HOME}/exawind/exawind-manager
+source ${EXAWIND_MANAGER}/start.sh
+spack-start
+quick-activate ${EXAWIND_MANAGER}/environments/amr-wind-of-gcc
+spack load amr-wind
+aw_exec="$(spack location -i amr-wind)/bin/amr_wind"
+
+export FI_MR_CACHE_MONITOR=memhooks
+export FI_CXI_RX_MATCH_MODE=software
+
+NTASKS_PER_NODE=72
+RANKS=$(( ${NTASKS_PER_NODE}*${SLURM_JOB_NUM_NODES} ))
+PLTNAME="plt117501"
+rm -rf ${PLTNAME}*
+
+SFX="native"
+srun -N ${SLURM_JOB_NUM_NODES} -n ${RANKS} --ntasks-per-node=${NTASKS_PER_NODE} --distribution=block:block --cpu_bind=rank_ldom ${aw_exec} jdm_2_aligned.inp > "${SFX}.log"
+mv "${PLTNAME}" "${PLTNAME}-${SFX}"
+
+SFX="hdf5"
+srun -N ${SLURM_JOB_NUM_NODES} -n ${RANKS} --ntasks-per-node=${NTASKS_PER_NODE} --distribution=block:block --cpu_bind=rank_ldom ${aw_exec} jdm_2_aligned.inp io.output_hdf5_plotfile=true > "${SFX}.log"
+mv "${PLTNAME}.h5" "${PLTNAME}-${SFX}"
+
+SFX="hdf5-reversible"
+srun -N ${SLURM_JOB_NUM_NODES} -n ${RANKS} --ntasks-per-node=${NTASKS_PER_NODE} --distribution=block:block --cpu_bind=rank_ldom ${aw_exec} jdm_2_aligned.inp io.output_hdf5_plotfile=true io.hdf5_compression="ZFP_REVERSIBLE@reversible" > "${SFX}.log"
+mv "${PLTNAME}.h5" "${PLTNAME}-${SFX}"
+
+COMPRESSIONS=("0.1" "0.001" "0.00001" "0.0000001" "0.000000001")
+for COMPRESS in "${COMPRESSIONS[@]}"; do
+    SFX="hdf5-zfp-${COMPRESS}"
+    srun -N ${SLURM_JOB_NUM_NODES} -n ${RANKS} --ntasks-per-node=${NTASKS_PER_NODE} --distribution=block:block --cpu_bind=rank_ldom ${aw_exec} jdm_2_aligned.inp io.output_hdf5_plotfile=true io.hdf5_compression="ZFP_ACCURACY@${COMPRESS}" > "${SFX}.log"
+    mv "${PLTNAME}.h5" "${PLTNAME}-${SFX}"
+done
+
