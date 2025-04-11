@@ -1,3 +1,5 @@
 post_processing
 *.log
 plt*
+*.csv
+*.o*
