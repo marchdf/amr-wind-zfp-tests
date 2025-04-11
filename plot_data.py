@@ -10,33 +10,44 @@ from functools import reduce
 
 plt.style.use(pathlib.Path(__file__).parent.resolve() / "project.mplstyle")
 
+
+def bytes_to_mb(bytes):
+    return bytes / (1024 * 1024)
+
+
 def main():
     fname = "data.csv"
     df = pd.read_csv(fname)
+    df["size"] = df["size"].apply(bytes_to_mb)
+    df.sort_values(by=["name"], inplace=True)
     print(df)
 
     pname = "plots.pdf"
-    plt.figure("timing", figsize=(14, 6))
-    ax = plt.gca()
-    ind = np.arange(len(df))
-    width = 1
-    ax.barh(
-        ind,
-        df.time,
-        width,
-        align="center",
-    )
-    ax.set(yticks=ind, yticklabels=df.name, ylim=[2 * width - 1, len(df)])
-    ax.invert_yaxis()
+    cols = ["time", "size"]
+    for col in cols:
+        plt.figure(f"{col}", figsize=(14, 6))
+        ax = plt.gca()
+        ind = np.arange(len(df))
+        width = 0.5
+        ax.barh(
+            ind,
+            df[f"{col}"],
+            width,
+            align="center",
+        )
+        ax.set(yticks=ind, yticklabels=df.name)
+        ax.invert_yaxis()
 
     # Save the plots
     with PdfPages(pname) as pdf:
-        plt.figure("timing")
+        plt.figure("time")
         plt.xlabel(r"Time $[s]$", fontsize=22, fontweight="bold")
-        plt.setp(ax.get_xmajorticklabels(), fontsize=22, fontweight="bold")
-        plt.setp(ax.get_ymajorticklabels(), fontsize=22, fontweight="bold")
-        plt.tight_layout()
         pdf.savefig(dpi=300)
-    
+
+        plt.figure("size")
+        plt.xlabel(r"Size $[MB]$", fontsize=22, fontweight="bold")
+        pdf.savefig(dpi=300)
+
+
 if __name__ == "__main__":
     main()

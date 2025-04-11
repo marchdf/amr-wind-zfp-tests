@@ -4,6 +4,7 @@ import glob
 import pathlib
 import csv
 
+
 def main():
 
     fnames = glob.glob("*.log")
@@ -18,16 +19,17 @@ def main():
 
         plt_path = pathlib.Path(f"{plt_pfx}-{name}")
         if plt_path.is_dir():
-            sze = sum(f.stat().st_size for f in plt_path.glob('**/*') if f.is_file())
+            sze = sum(f.stat().st_size for f in plt_path.glob("**/*") if f.is_file())
         elif plt_path.is_file():
             sze = plt_path.stat().st_size
         lst.append({"name": name, "time": time, "size": sze})
     keys = lst[0].keys()
     fname = "data.csv"
-    with open(fname, 'w', newline='') as f:
+    with open(fname, "w", newline="") as f:
         dict_writer = csv.DictWriter(f, keys)
         dict_writer.writeheader()
         dict_writer.writerows(lst)
-        
-if __name__ == '__main__':
+
+
+if __name__ == "__main__":
     main()
