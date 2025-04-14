@@ -3,12 +3,14 @@
 import glob
 import pathlib
 import csv
+import modify_hdf5_attributes as mha
 
 
 def main():
 
     fnames = glob.glob("*.log")
     plt_pfx = "plt117501"
+    pnames = glob.glob(f"{plt_pfx}*")
     lst = []
 
     # Get the number of fields from the native plt file
@@ -16,6 +18,10 @@ def main():
         f.readline()
         nfields = int(f.readline())
 
+    for pname in pnames:
+        if "hdf5" in pname:
+            mha.modify_attributes(pname)
+        
     for fname in fnames:
         name = fname.replace(".log", "")
         with open(fname, "r") as f:
