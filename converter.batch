@@ -1,0 +1,15 @@
+#!/usr/bin/env bash
+#SBATCH --job-name=zfp-convert
+#SBATCH --account=extremedata
+#SBATCH --time=0:05:00
+#SBATCH --nodes=1
+#SBATCH -o %x.o%j
+#SBATCH --partition=short
+#SBATCH --exclusive
+
+CONVERTEXEC="/projects/extremedata/mhenryde/PeleAnalysis/Src/convert2hdf53d.gnu.x86-spr.MPI.ex"
+FNAMES=( "plt117501-native" )
+COMPRESSION="ZFP_ACCURACY@0.000000001"
+for FNAME in "${FNAMES[@]}"; do
+    srun -n 1 "${CONVERTEXEC}" infile="${FNAME}" hdf5_compression="${COMPRESSION}"
+done
