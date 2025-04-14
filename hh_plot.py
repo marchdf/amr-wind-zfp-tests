@@ -26,12 +26,16 @@ def main():
     ds = yt.load(
         fname, units_override={"length_unit": (1.0, "m"), "time_unit": (1.0, "s")}
     )
+    
     Lx, Ly, Lz = ds.domain_right_edge
     Lx = float(Lx)
     Ly = float(Ly)
     slc = yt.SlicePlot(ds, normal=2, fields="velocityx", center=[Lx // 2, Ly // 2, 90])
     slc.save(outfile)
 
+    # Nx, Ny, Nz = ds.domain_dimensions
+    # all_data = ds.covering_grid(level=0, left_edge=[0, 0.0, 0.0], dims=[Nx, Ny, Nz])
+    # print(f"Covering grid size: {all_data.shape}")
 
 if __name__ == "__main__":
     main()
