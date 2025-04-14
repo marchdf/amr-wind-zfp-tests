@@ -5,6 +5,7 @@ import h5py
 import hdf5plugin
 import numpy as np
 
+
 def modify_attributes(fname):
     """Modifies HDF5 attributes from amrex plt files to be compatible with yt"""
     hf = h5py.File(fname, "r+")
@@ -19,7 +20,7 @@ def modify_attributes(fname):
                 key, hf["Chombo_global"].attrs[key].item()
             )
     hf.close()
-    
+
 
 def main():
     """Plot data."""
@@ -38,6 +39,7 @@ def main():
 
     for fname in args.fname:
         modify_attributes(fname)
+
 
 if __name__ == "__main__":
     main()
