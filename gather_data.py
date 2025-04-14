@@ -4,6 +4,8 @@ import glob
 import pathlib
 import csv
 import modify_hdf5_attributes as mha
+import yt
+import numpy as np
 
 
 def main():
@@ -14,16 +16,33 @@ def main():
     lst = []
 
     # Get the number of fields from the native plt file
-    with open(f"{plt_pfx}-native/Header", "r") as f:
+    fname = f"{plt_pfx}-native"
+    with open(f"{fname}/Header", "r") as f:
         f.readline()
         nfields = int(f.readline())
+    pname = fname.replace(".log", "")
+    nds = yt.load(
+        pname, units_override={"length_unit": (1.0, "m"), "time_unit": (1.0, "s")}
+    )
+    native_data = nds.covering_grid(
+        level=0, left_edge=[0, 0.0, 0.0], dims=nds.domain_dimensions
+    )
 
-    for pname in pnames:
-        if "hdf5" in pname:
-            mha.modify_attributes(pname)
-        
     for fname in fnames:
         name = fname.replace(".log", "")
+        pname = f"{plt_pfx}-{name}"
+
+        if "hdf5" in pname:
+            mha.modify_attributes(pname)
+
+        ds = yt.load(
+            pname, units_override={"length_unit": (1.0, "m"), "time_unit": (1.0, "s")}
+        )
+        all_data = ds.covering_grid(
+            level=0, left_edge=[0, 0.0, 0.0], dims=ds.domain_dimensions
+        )
+        error = np.linalg.norm(all_data["velocityx"] - native_data["velocityx"])
+
         with open(fname, "r") as f:
             ncells = 0
             for line in f:
@@ -44,6 +63,7 @@ def main():
                 "size": sze,
                 "ncells": ncells,
                 "nfields": nfields,
+                "error": error.value,
             }
         )
     keys = lst[0].keys()

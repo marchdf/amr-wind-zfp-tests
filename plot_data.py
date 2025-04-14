@@ -29,7 +29,7 @@ def main():
     print(df)
 
     pname = "plots.pdf"
-    cols = ["time", "size", "time_dof", "size_dof", "time_norm", "size_norm"]
+    cols = ["time", "size", "time_dof", "size_dof", "time_norm", "size_norm", "error"]
     for col in cols:
         plt.figure(f"{col}", figsize=(14, 6))
         ax = plt.gca()
@@ -68,6 +68,11 @@ def main():
 
         plt.figure("size_norm")
         plt.xlabel(r"Size $[-]$", fontsize=22, fontweight="bold")
+        pdf.savefig(dpi=300)
+
+        plt.figure("error")
+        plt.xlabel(r"Error $[m/s]$", fontsize=22, fontweight="bold")
+        ax.set_xscale("log")
         pdf.savefig(dpi=300)
 
 
