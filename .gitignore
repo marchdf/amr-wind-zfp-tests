@@ -1,3 +1,5 @@
+.DS_Store
+__pycache__/
 post_processing
 *.log
 plt*
