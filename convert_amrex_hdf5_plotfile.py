@@ -34,7 +34,7 @@ def main():
                 component = int(key.split("_")[1])
                 dct[field] = component
         nvars = len(dct)
-        print(dct)
+
         # Characterize box array
         ba_shape0 = f["level_0"]["boxes"][0]
         ba_di = ba_shape0[3] - ba_shape0[0] + 1
@@ -54,7 +54,6 @@ def main():
         dom_nx = f["level_0"].attrs["prob_domain"][3] + 1
         dom_ny = f["level_0"].attrs["prob_domain"][4] + 1
         dom_nz = f["level_0"].attrs["prob_domain"][5] + 1
-        print(dom_nx, dom_ny, dom_nz)
 
         # Reformat 1D into 3D data, iterating over variables
         data = np.zeros((nvars, dom_nx, dom_ny, dom_nz))

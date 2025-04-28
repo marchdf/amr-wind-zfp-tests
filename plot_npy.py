@@ -7,6 +7,7 @@ from functools import reduce
 
 plt.style.use(pathlib.Path(__file__).parent.resolve() / "project.mplstyle")
 
+
 def main():
 
     data = np.load("plt117501-hdf5-zfp-0.0000001.npy")
@@ -19,10 +20,10 @@ def main():
     plt.imshow(np.flip(data[comp, xidx, :, :].T, axis=1), origin="lower")
 
     plt.figure("velocityx-1")
-    plt.imshow(data[comp, :, yidx, :].T, origin='lower')
-    
+    plt.imshow(data[comp, :, yidx, :].T, origin="lower")
+
     plt.figure("velocityx-2")
-    plt.imshow(data[comp, :, :, zidx].T, origin='lower')
+    plt.imshow(data[comp, :, :, zidx].T, origin="lower")
 
     # Save the plots
     pname = "plots_npy.pdf"
