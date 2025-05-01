@@ -33,11 +33,19 @@ def main():
         help="Overlay the computational grid atop the countours",
         action = "store_true",
     )
+    parser.add_argument(
+        "--field",
+        help="Field from the plt file to plot",
+        required=False,
+        type=str,
+        default='velocityx',
+    )
     args = parser.parse_args()
     fname = args.fname
     outfile = args.outfile
     z_height = args.z_height
     show_grid = args.show_grid
+    field = args.field
 
     ds = yt.load(
         fname, units_override={"length_unit": (1.0, "m"), "time_unit": (1.0, "s")}
@@ -47,9 +55,9 @@ def main():
     Lx = float(Lx)
     Ly = float(Ly)
     slc = yt.SlicePlot(
-        ds, normal=2, fields="velocityx", center=[Lx // 2, Ly // 2, args.z_height]
+        ds, normal=2, fields=field, center=[Lx // 2, Ly // 2, args.z_height]
     )
-    slc.set_log("velocityx", False)
+    slc.set_log(field, False)
     if show_grid:
         slc.annotate_grids()
     slc.save(outfile)
