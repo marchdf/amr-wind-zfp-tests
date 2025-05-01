@@ -27,10 +27,19 @@ def main():
         type=float,
         default=90.0,
     )
+    parser.add_argument(
+        "-g",
+        "--show_grid",
+        help="Overlay the computational grid atop the countours",
+        required=False,
+        type=bool,
+        default=False,
+    )
     args = parser.parse_args()
     fname = args.fname
     outfile = args.outfile
     z_height = args.z_height
+    show_grid = args.show_grid
 
     ds = yt.load(
         fname, units_override={"length_unit": (1.0, "m"), "time_unit": (1.0, "s")}
@@ -42,7 +51,9 @@ def main():
     slc = yt.SlicePlot(
         ds, normal=2, fields="velocityx", center=[Lx // 2, Ly // 2, args.z_height]
     )
-    slc.annotate_grids()
+    slc.set_log("velocityx", False)
+    if show_grid:
+        slc.annotate_grids()
     slc.save(outfile)
 
     # Nx, Ny, Nz = ds.domain_dimensions
