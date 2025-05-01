@@ -31,9 +31,7 @@ def main():
         "-g",
         "--show_grid",
         help="Overlay the computational grid atop the countours",
-        required=False,
-        type=bool,
-        default=False,
+        action = "store_true",
     )
     args = parser.parse_args()
     fname = args.fname
