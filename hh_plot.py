@@ -19,18 +19,47 @@ def main():
     parser.add_argument(
         "-o", "--outfile", help="Filename for output plot", required=True, type=str
     )
+    parser.add_argument(
+        "-z",
+        "--z_height",
+        help="Filename for output plot",
+        required=False,
+        type=float,
+        default=90.0,
+    )
+    parser.add_argument(
+        "-g",
+        "--show_grid",
+        help="Overlay the computational grid atop the countours",
+        action = "store_true",
+    )
+    parser.add_argument(
+        "--field",
+        help="Field from the plt file to plot",
+        required=False,
+        type=str,
+        default='velocityx',
+    )
     args = parser.parse_args()
     fname = args.fname
     outfile = args.outfile
+    z_height = args.z_height
+    show_grid = args.show_grid
+    field = args.field
 
     ds = yt.load(
         fname, units_override={"length_unit": (1.0, "m"), "time_unit": (1.0, "s")}
     )
 
-    Lx, Ly, Lz = ds.domain_right_edge
+    Lx, Ly, Lz = ds.domain_right_edge - ds.domain_left_edge
     Lx = float(Lx)
     Ly = float(Ly)
-    slc = yt.SlicePlot(ds, normal=2, fields="velocityx", center=[Lx // 2, Ly // 2, 90])
+    slc = yt.SlicePlot(
+        ds, normal=2, fields=field, center=[Lx // 2, Ly // 2, args.z_height]
+    )
+    slc.set_log(field, False)
+    if show_grid:
+        slc.annotate_grids()
     slc.save(outfile)
 
     # Nx, Ny, Nz = ds.domain_dimensions
