@@ -33,15 +33,15 @@ def main():
         "-g",
         "--show_grid",
         help="Overlay the computational grid atop the countours",
-        action = "store_true",
+        action="store_true",
     )
     parser.add_argument(
         "--fields",
         help="Field from the plt file to plot",
         required=False,
         type=str,
-        default=['velocityx'],
-        nargs='+',
+        default=["velocityx"],
+        nargs="+",
     )
     args = parser.parse_args()
     fname = args.fname
@@ -61,15 +61,11 @@ def main():
         slc = yt.SlicePlot(
             ds, normal=2, fields=fields, center=[Lx // 2, Ly // 2, args.z_height]
         )
-        slc.set_log('all', False)
+        slc.set_log("all", False)
         if show_grid:
             slc.annotate_grids()
         for field in fields:
             pdf.savefig(slc.plots[field].figure)
-
-    ##slc.set_log(field, False)
-    ##slc.save(outfile)
-        #pdf.savefig()
 
     # Nx, Ny, Nz = ds.domain_dimensions
     # all_data = ds.covering_grid(level=0, left_edge=[0, 0.0, 0.0], dims=[Nx, Ny, Nz])
