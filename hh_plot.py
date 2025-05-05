@@ -37,7 +37,7 @@ def main():
     )
     parser.add_argument(
         "--fields",
-        help="Field from the plt file to plot",
+        help="Fields from the plt file to plot",
         required=False,
         type=str,
         default=["velocityx"],
