@@ -4,6 +4,8 @@ import hdf5plugin
 import yt
 import argparse
 import glob
+from matplotlib.backends.backend_pdf import PdfPages
+from matplotlib import pyplot as plt
 
 
 def main():
@@ -31,21 +33,22 @@ def main():
         "-g",
         "--show_grid",
         help="Overlay the computational grid atop the countours",
-        action = "store_true",
+        action="store_true",
     )
     parser.add_argument(
-        "--field",
-        help="Field from the plt file to plot",
+        "--fields",
+        help="Fields from the plt file to plot",
         required=False,
         type=str,
-        default='velocityx',
+        default=["velocityx"],
+        nargs="+",
     )
     args = parser.parse_args()
     fname = args.fname
     outfile = args.outfile
     z_height = args.z_height
     show_grid = args.show_grid
-    field = args.field
+    fields = args.fields
 
     ds = yt.load(
         fname, units_override={"length_unit": (1.0, "m"), "time_unit": (1.0, "s")}
@@ -54,13 +57,16 @@ def main():
     Lx, Ly, Lz = ds.domain_right_edge - ds.domain_left_edge
     Lx = float(Lx)
     Ly = float(Ly)
-    slc = yt.SlicePlot(
-        ds, normal=2, fields=field, center=[Lx // 2, Ly // 2, args.z_height]
-    )
-    slc.set_log(field, False)
-    if show_grid:
-        slc.annotate_grids()
-    slc.save(outfile)
+    with PdfPages(outfile) as pdf:
+        slc = yt.SlicePlot(
+            ds, normal=2, fields=fields, center=[Lx // 2, Ly // 2, args.z_height]
+        )
+        slc.set_log("all", False)
+        if show_grid:
+            slc.annotate_grids()
+        slc.render()
+        for field in fields:
+            pdf.savefig(slc.plots[field].figure)
 
     # Nx, Ny, Nz = ds.domain_dimensions
     # all_data = ds.covering_grid(level=0, left_edge=[0, 0.0, 0.0], dims=[Nx, Ny, Nz])
