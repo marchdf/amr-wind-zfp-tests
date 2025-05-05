@@ -64,6 +64,7 @@ def main():
         slc.set_log("all", False)
         if show_grid:
             slc.annotate_grids()
+        slc.render()
         for field in fields:
             pdf.savefig(slc.plots[field].figure)
 
